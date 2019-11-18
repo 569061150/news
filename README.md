@@ -1,3 +1,13 @@
+1. /checkup/account      分类管理      
+2. /channel/management      应用管理       
+3. /blackWhiteList/equipment      应用推广       
+4. /reportForms/management   评价管理         
+5. /systemLogs/logs   意见反馈         
+6. /channel/appManagement   应用市场版本         
+
+
+
+
 拖拽：
 https://www.npmjs.com/package/awe-dnd
 "sortablejs": "^1.10.1",
@@ -16,3 +26,6 @@ Request URL: http://10.42.1.233:8080/sysuser/sysUserGroup/queryPage
 // 失去焦点：遍历所有
 //   1。 为空 = 添加“err nulls”，
 //   2。 不为空 = 先移除所有的状态 “err nulls”，在把重复的状态加回来
+
+
+

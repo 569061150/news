@@ -1,126 +1,240 @@
 <template>
-  <div class="container">-hollow {{passwordType}}  报表中心-</div>
+  <div>
+    <div class="ne-search">
+      <el-form :inline="true" :model="formInline" ref="formInline" class="demo-form-inline">
+        <el-form-item label="应用商店版本号：" prop="appVersion">
+          <el-input size="medium" v-model="formInline.appVersion" placeholder=""></el-input>
+        </el-form-item>
+
+        <el-form-item label="用户id：" prop="userId">
+          <el-input size="medium" v-model="formInline.userId" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item label="用户昵称：" prop="userName">
+          <el-input size="medium" v-model="formInline.userName" placeholder=""></el-input>
+        </el-form-item>
+
+        <el-form-item label="类型：" prop="userType">
+          <el-select v-model="formInline.userType" placeholder="请选择">
+            <el-option
+              v-for="item in typesArr"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button size="medium" type="primary" @click="submitForm()">查询</el-button>
+          <el-button size="medium" @click="resetForm('formInline')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+
+    <div class="mTop20">
+      <template>
+        <el-table
+          :data="tableData"
+          style="width: 100%">
+          <el-table-column
+            prop="id"
+            label="应用ID"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="groupName"
+            label="应用名称"
+          >
+          </el-table-column>
+
+          <el-table-column
+            prop="tenantId"
+            label="应用版本号">
+          </el-table-column>
+
+          <el-table-column
+            prop="groupDesc"
+            label="用户id">
+          </el-table-column>
+
+          <el-table-column
+            prop="groupName"
+            label="用户昵称">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="评分">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="评价内容">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="提交时间">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="更新时间">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="品牌/车系/车型">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="车辆VIN码">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="车机品牌">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="车机编号">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="车机系统版本">
+          </el-table-column>
+
+          <el-table-column
+            prop="address"
+            label="应用商店版本">
+          </el-table-column>
+
+        </el-table>
+      </template>
+
+      <div class="pagination">
+        <el-pagination
+          background
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="paginationConfig.pageIndex"
+          :page-size="paginationConfig.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="paginationConfig.total">
+        </el-pagination>
+      </div>
+    </div>
+
+  </div>
 </template>
-
 <script>
-  // import {generaMenu} from '@/config/tools'
+    import {mapState} from 'vuex';
+    import {getTableData} from '../../api/typeManagement.js';
 
-  export default {
-    name: 'login',
-    data() {
-      return {
-        now: "321321",
-        passwordType:""
-      }
-    },
-    mounted() {
-        this.passwordType = this.$route.params.id
-    },
-    methods: {
-
-    }
-  }
+    export default {
+        props: [],
+        data() {
+            return {
+                typesArr: [
+                    {
+                        value: '',
+                        label: '全部'
+                    },
+                    {
+                        value: '1',
+                        label: '意见反馈'
+                    },
+                    {
+                        value: '2',
+                        label: '遇到问题'
+                    }
+                ],
+                formInline: {
+                    appId: '',
+                    appName: '',
+                    version: '',
+                    userId: '',
+                    userName: '',
+                },
+                tableData: [],
+                paginationConfig: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    total: 0
+                }
+            };
+        },
+        mounted() {
+            this.getTableDataFn({
+                appId: this.formInline.appId,
+                appName: this.formInline.appName,
+                version: this.formInline.version,
+                userId: this.formInline.userId,
+                userName: this.formInline.userName,
+                pageSize: this.paginationConfig.pageSize,
+                pageNum: this.paginationConfig.pageIndex
+            })
+        },
+        methods: {
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+                this.getTableDataFn({
+                    pageSize: val,
+                    pageNum: this.paginationConfig.pageIndex
+                })
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+                this.getTableDataFn({
+                    appId: this.formInline.appId,
+                    appName: this.formInline.appName,
+                    version: this.formInline.version,
+                    userId: this.formInline.userId,
+                    userName: this.formInline.userName,
+                    pageSize: this.paginationConfig.pageSize,
+                    pageNum: val
+                })
+            },
+            getTableDataFn(params) {
+                getTableData(params).then(res => {
+                    if (res.data.code == 301000) {
+                        this.tableData = res.data.data.list;
+                        this.paginationConfig.total = res.data.data.total;
+                        this.paginationConfig.pageIndex = res.data.data.pageNum;
+                        this.paginationConfig.pageSize = res.data.data.pageSize;
+                    }
+                });
+            },
+            submitForm() {
+                console.log('submit!');
+                this.getTableDataFn({
+                    appId: this.formInline.appId,
+                    appName: this.formInline.appName,
+                    version: this.formInline.version,
+                    userId: this.formInline.userId,
+                    userName: this.formInline.userName,
+                    pageSize: this.paginationConfig.pageSize,
+                    pageNum: this.paginationConfig.pageIndex
+                })
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
+            }
+        },
+        computed: {
+            // ...mapState({
+            //     isTypeManagement: state => state.common.isTypeManagement
+            // })
+        },
+        watch: {
+        }
+    };
 </script>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
-  $bg: #2d3a4b;
-  $light_gray: #eee;
-  /* reset element-ui css */
-  .login-container {
-    .el-input {
-      display: inline-block;
-      height: 47px;
-      width: 85%;
-      input {
-        background: transparent;
-        border: 0px;
-        -webkit-appearance: none;
-        border-radius: 0px;
-        padding: 12px 5px 12px 15px;
-        color: $light_gray;
-        height: 47px;
-        &:-webkit-autofill {
-          -webkit-box-shadow: 0 0 0px 1000px $bg inset !important;
-          -webkit-text-fill-color: #fff !important;
-        }
-      }
-    }
-    .el-form-item {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(0, 0, 0, 0.1);
-      border-radius: 5px;
-      color: #454545;
-    }
-  }
+<style scoped lang="scss">
 </style>
 
-<style rel="stylesheet/scss" lang="scss" scoped>
-  $bg: #2d3a4b;
-  $dark_gray: #889aa4;
-  $light_gray: #eee;
-  .login-container {
-    position: fixed;
-    height: 100%;
-    width: 100%;
-    background-color: $bg;
-    .login-form {
-      position: absolute;
-      left: 0;
-      right: 0;
-      width: 520px;
-      padding: 35px 35px 15px 35px;
-      margin: 120px auto;
-    }
-    .tips {
-      font-size: 14px;
-      color: #fff;
-      margin-bottom: 10px;
-      span {
-        &:first-of-type {
-          margin-right: 16px;
-        }
-      }
-    }
-    .svg-container {
-      padding: 6px 5px 6px 15px;
-      color: $dark_gray;
-      vertical-align: middle;
-      width: 30px;
-      display: inline-block;
-      &_login {
-        font-size: 20px;
-      }
-    }
-    .title-container {
-      position: relative;
-      .title {
-        font-size: 26px;
-        font-weight: 400;
-        color: $light_gray;
-        margin: 0px auto 40px auto;
-        text-align: center;
-        font-weight: bold;
-      }
-      .set-language {
-        color: #fff;
-        position: absolute;
-        top: 5px;
-        right: 0px;
-      }
-    }
-    .show-pwd {
-      position: absolute;
-      right: 10px;
-      top: 7px;
-      font-size: 16px;
-      color: $dark_gray;
-      cursor: pointer;
-      user-select: none;
-    }
-    .thirdparty-button {
-      position: absolute;
-      right: 35px;
-      bottom: 28px;
-    }
-  }
-</style>
