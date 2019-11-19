@@ -20,7 +20,7 @@
       title="提示"
       :modal="false"
       :visible.sync="dialogVisible"
-      width="30%"
+      width="20%"
       >
       <span>是否退出登录？</span>
       <span slot="footer" class="dialog-footer">

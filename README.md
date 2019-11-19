@@ -6,8 +6,8 @@
 6. /channel/appManagement   应用市场版本         
 
 
-
-
+// 蓝狐
+https://lanhuapp.com/url/xPALv-DTNi2
 拖拽：
 https://www.npmjs.com/package/awe-dnd
 "sortablejs": "^1.10.1",

@@ -82,7 +82,7 @@
             <el-table-column
               label="操作"
               fixed="right"
-              width="180"
+              width="100"
             >
               <template slot-scope="scope">
                 <el-button @click="setTypeSubmit(scope.row,'download')" type="text" size="small">下载</el-button>
@@ -110,34 +110,24 @@
       title="上传新版本"
       v-dialogDrag
       :modal="false"
-      :visible="dialogVisible"
-      width="37%"
+      :visible.sync="dialogVisible"
+      width="40%"
     >
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="90px" class="demo-ruleForm">
         <el-form-item label="安装包" prop="documentsFile">
-          <!--          <el-input v-model="ruleForm.documentsFile" placeholder=""></el-input>-->
+          <div class="upload-theme-tips">{{documentsFileName}}</div>
           <el-upload
-            class="upload"
-            ref="upload"
+            class="upload-demo"
             action="string"
-            :file-list="fileList"
             :auto-upload="false"
-            :http-request="uploadFile"
+            :show-file-list="false"
+            :disabled="loading"
             :on-change="handleChange"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            multiple="multiple"
           >
-            <el-button slot="trigger" size="small" type="primary" @click="delFile">选取文件</el-button>
-            <el-button
-              style="margin-left: 10px;"
-              size="small"
-              type="success"
-              @click="submitUpload"
-            >上传到服务器
-            </el-button>
+            <el-button type="primary" :loading="loading">点击上传</el-button>
           </el-upload>
         </el-form-item>
+
 
         <el-form-item label="包名" prop="documentsName">
           <el-input v-model="ruleForm.documentsName" placeholder=""></el-input>
@@ -148,7 +138,7 @@
         </el-form-item>
 
         <el-form-item label="更新说明" prop="description">
-          <el-input v-model="ruleForm.description" placeholder=""></el-input>
+          <el-input type="textarea" v-model="ruleForm.description" placeholder=""></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -163,15 +153,14 @@
     import $ from 'jquery';
     import {mapState, mapGetters} from 'vuex';
     import {getTableData, exportExcelData} from '../../api/typeManagement.js';
+    import {subjectUpload} from '../../api/upload.js';
     import {find_repeat} from '../../utils/tools.js';
+    import axios from 'axios'
 
     export default {
         data() {
             return {
-                fileList: [],
-                multiple: true,
-                formData: "",
-
+                loading: false,
                 dialogVisible: false,
                 csId: '',
                 formInline: {
@@ -183,6 +172,7 @@
                     pageSize: 10,
                     total: 0
                 },
+                documentsFileName: "",
                 ruleForm: {
                     documentsFile: '',
                     documentsName: '',
@@ -191,16 +181,16 @@
                 },
                 rules: {
                     documentsFile: [
-                        {required: true, message: '请上传安装包'},
+                        {required: true, message: '请上传安装包', trigger: "change"},
                     ],
                     documentsName: [
                         {required: true, message: '请输入活动名称', trigger: 'blur'},
                     ],
                     version: [
-                        {required: true, message: '请输入活动名称', trigger: 'blur'},
+                        {required: true, message: '请输入包名', trigger: 'blur'},
                     ],
                     description: [
-                        {required: true, message: '请输入活动名称', trigger: 'blur'},
+                        {required: true, message: '请输入更新说明', trigger: 'blur'},
                     ],
                 },
             };
@@ -209,47 +199,51 @@
             this.getTableDataFn({})
         },
         methods: {
-            delFile() {
-                this.fileList = [];
+            submitSave(formName) {
+                console.log(this.ruleForm)
+                this.$refs[formName].validateField('documentsFile');
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        console.log(this.ruleForm)
+                        alert('submit!');
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
             },
             handleChange(file, fileList) {
-                this.fileList = fileList;
+                console.log("beforeAvatarUpload")
+                let fileName = file.name
+                let pos = fileName.lastIndexOf('.')
+                let lastName = fileName.substring(pos, fileName.length)
+                if (lastName.toLowerCase() !== '.zip' && lastName.toLowerCase() !== '.rar') {
+                    this.$message.error('文件必须为.zip或者.rar类型')
+                    return
+                }
+                // 限制上传文件的大小
+                const isLt = file.size / 1024 / 1024 / 100 <= 1
+                if (!isLt) {
+                    this.$message.error('上传文件大小不得小于5KB,不得大于100MB!')
+                    return
+                }
+
+                this.submitUpload(file);
             },
-            uploadFile(file) {
-                this.formData.append("file", file.file);
-            },
-            handleRemove(file, fileList) {
-                console.log(file, fileList);
-            },
-            handlePreview(file) {
-                console.log(file);
-            },
-            submitUpload() {
+            submitUpload(file) {
+                this.loading = true
                 let formData = new FormData();
-                formData.append("theme", this.theme);
-                formData.append("file", this.fileList[0].raw);
-                console.log(this.fileList[0])
-                // axios({
-                //     url: this.HOST + "/thematicfile/upload",
-                //     method: "post",
-                //     data: formData,
-                //     headers: {
-                //         "Content-Type": "multipart/form-data;charset=utf-8"
-                //     }
-                // })
-                //     .then(res => {
-                //         if (res.data.success) {
-                //             // alert("导入成功!");
-                //         } else {
-                //             alert(res.data.message + "," + res.data.data);
-                //         }
-                //     })
-                //     .catch(err => {
-                //         console.log(err);
-                //     });
+                formData.append("file", file.raw);
+                subjectUpload('http://backend-api-8081-xd-tsp-dev.xd-dev.nxengine.com/v1.0/subjectDown/subjectUpload', formData).then(res => {
+                    this.loading = false
+                    this.documentsFileName = file.name
+                    this.ruleForm.documentsFile = res.data.data.url
+                }).catch((err) => {
+                    this.loading = false
+                    this.documentsFileName = ""
+                    this.ruleForm.documentsFile = ""
+                })
             },
-
-
             toRouer(obj) {
                 this.$message.closeAll();
                 this.$emit('change-route', obj);
@@ -318,28 +312,33 @@
                     console.log(err)
                 })
             },
-            submitSave(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        alert('submit!');
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-            },
+
             setTypeSubmit(row, type) {
                 this.csId = row.id
                 this.download();
             }
-        },
+        }
+        ,
         computed: {
             // ...mapState({
             //     isTypeManagement: state => state.common.isTypeManagement
             // })
-        },
-        watch: {}
-    };
+        }
+        ,
+        watch: {
+            dialogVisible() {
+                this.loading = false
+                this.documentsFileName = ""
+                this.ruleForm = {
+                    documentsFile: '',
+                    documentsName: '',
+                    version: '',
+                    description: '',
+                }
+            }
+        }
+    }
+    ;
 </script>
 
 <style scoped lang="scss">
@@ -359,6 +358,23 @@
   .lookInfo {
     color: #00A6D2;
     cursor: pointer;
+  }
+
+  .upload-demo {
+    display: inline-block;
+  }
+
+  .upload-theme-tips {
+    width: 178px;
+    height: 40px;
+    vertical-align: top;
+    border: 1px solid #dcdee2;
+    border-radius: 4px;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0 6px;
+    display: inline-block;
+    overflow: hidden;
   }
 </style>
 

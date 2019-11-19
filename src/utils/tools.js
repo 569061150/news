@@ -93,7 +93,7 @@ export const find_repeat = (key, data, cb) => {
         is_repeat = true;
         cb(j, data[j])
       }
-      console.log(data[j][key],data[i][key],is_check.indexOf(j))
+     // console.log(data[j][key],data[i][key],is_check.indexOf(j))
     }
     if (is_repeat) {
       cb(i, data[i])

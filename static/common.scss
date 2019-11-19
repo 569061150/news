@@ -391,10 +391,12 @@ $dialogPaddingRight: 60px;
 }
 
 .el-dialog{
-  max-width: 450px!important;
+  max-width: 550px!important;
 }
 
 .el-dialog__body{
   line-height: initial;
   text-align: left;
+  padding: 30px 50px;
 }
+

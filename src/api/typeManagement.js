@@ -1,6 +1,5 @@
 import request from '../utils/request'
 import store from '../store'
-import axios from 'axios'
 
 //获取数据列表
 export const getTableData = (params) => {
@@ -27,6 +26,10 @@ export function exportExcelData(params) {
     responseType: 'blob',
     url: process.env.AUTH + '/auth/akmgChannelMgr/channel/export',
     method: 'post',
-    data: params
+    data: params,
+    config:{
+      headers:{}
+    }
   })
 }
+
