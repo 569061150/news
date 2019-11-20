@@ -16,42 +16,23 @@
           </el-form-item>
 
           <el-form-item class="appIcon" label="应用图标" prop="appIcon">
-            <el-upload
+            <dialogFile
+              ref="dialogFile1"
               v-model="ruleForm.appIcon"
-              class="avatar-uploader"
-              action="string"
-              :auto-upload="false"
-              :show-file-list="false"
-              :disabled="loading"
-              :on-change="handleChange"
-            >
-              <div v-if="imageUrl" class="avatar" :loading="loading">
-                <img :src="imageUrl">
-              </div>
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload>
+              @getData="getAppIconData"
+              :limit="1"
+              :fileList="appIconFileList"
+            ></dialogFile>
           </el-form-item>
 
-          <el-form-item label="应用截图" prop="screenshot">
-            <el-upload
-              action="string"
-              list-type="picture-card"
-              :on-remove="handleRemove"
-
-              :auto-upload="false">
-              <i slot="default" class="el-icon-plus"></i>
-              <div slot="file" slot-scope="{file}">
-                <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
-                <div class="el-upload-list__item-actions">
-                  <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
-                    <i class="el-icon-zoom-in"></i>
-                  </span>
-                  <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleRemove(file)">
-                    <i class="el-icon-delete"></i>
-                  </span>
-                </div>
-              </div>
-            </el-upload>
+          <el-form-item class="appIcon" label="应用截图" prop="screenshot">
+            <dialogFile
+              ref="dialogFile2"
+              v-model="ruleForm.screenshot"
+              @getData="getScreenshotData"
+              :limit="5"
+              :fileList="screenshotFileList"
+            ></dialogFile>
           </el-form-item>
 
         </el-form>
@@ -62,10 +43,6 @@
       </div>
     </el-dialog>
 
-    <el-dialog :visible.sync="FixdialogVisible">
-      <img width="100%" :src="dialogImageUrl" alt="">
-    </el-dialog>
-
   </div>
 </template>
 <script>
@@ -73,23 +50,19 @@
     import {subjectUpload} from '../../../api/upload.js';
 
     export default {
+        components: {
+            'dialogFile': () => import('./dialogFile')
+        },
         props: ['dialogVisible', 'type', 'row', 'title', 'index'],
         data() {
             return {
-                loading: false,
-                stateType: true,
-                message: '',
+                appIconFileList: [],  //  图标初始化
+                screenshotFileList: [],    //  应用截图
                 ruleForm: {
                     appName: '',
-                    appIcon: '',
-                    screenshot: '',
+                    appIcon: [],
+                    screenshot: [],
                 },
-                fileList: [],
-                imageUrl: '',
-                //
-                dialogImageUrl: '',
-                FixdialogVisible: false,
-                disabled: false
             };
         },
         computed: {
@@ -109,49 +82,35 @@
             }
         },
         mounted() {
+
+        },
+        created() {
+            this.appIconFileList = [{
+                name: 'food.jpeg',
+                url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+            }]
+            //  图标初始化
+            this.screenshotFileList = [{
+                name: 'food.jpeg',
+                url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+            }, {
+                name: 'food2.jpeg',
+                url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+            }]
         },
         methods: {
-            //  应用图标
-            handleChange(file) {
-                console.log(file)
-                //  this.loading = true
-                const isJPG = file.raw.type === 'image/jpeg' || file.raw.type === 'image/jpg' || file.raw.type === 'image/png';
-                const isLt2M = file.raw.size / 1024 / 1024 < 2;
-                if (!isJPG) {
-                    this.$message.error('上传头像图片只能是 JPG 格式!');
-                    return
-                }
-                if (!isLt2M) {
-                    this.$message.error('上传头像图片大小不能超过 2MB!');
-                    return
-                }
-                this.submitUpload(file)
+            getAppIconData(obj) {
+                console.log("getAppIconData===")
+                console.log(obj)
+                this.ruleForm.appIcon = obj
+                this.$refs["ruleForm"].validateField('appIcon');
             },
-            submitUpload(file) {
-                this.loading = true
-                let formData = new FormData();
-                formData.append("file", file.raw);
-                subjectUpload('http://backend-api-8081-xd-tsp-dev.xd-dev.nxengine.com/v1.0/subjectDown/subjectUpload', formData).then(res => {
-                    this.loading = false
-                    this.imageUrl = URL.createObjectURL(file.raw);
-                    this.ruleForm.appIcon = res.data.data.url
-                }).catch((err) => {
-                    this.loading = false
-                    this.documentsFileName = ""
-                    this.ruleForm.documentsFile = ""
-                })
+            getScreenshotData(obj) {
+                console.log("getScreenshotData===")
+                console.log(obj)
+                this.ruleForm.screenshot = obj
+                this.$refs["ruleForm"].validateField('screenshot');
             },
-
-
-            handleRemove(file) {
-                console.log(file);
-            },
-            handlePictureCardPreview(file) {
-                this.dialogImageUrl = file.url;
-                this.FixdialogVisible = true;
-            },
-
-
             dialogVisibleClose(type) {
                 this.$emit('dialogVisibleClose', type);
             },
@@ -164,9 +123,14 @@
                 this.dialogVisibleClose('editBtn');
             },
             submit(formName) {
+                console.log(this.ruleForm)
+                this.$refs[formName].validateField('appIcon');
+                this.$refs[formName].validateField('screenshot');
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         console.log(this.ruleForm)
+                        this.$refs.dialogFile1.emptyUpload();
+                        this.$refs.dialogFile2.emptyUpload();
                         if (this.type == 'add') {
                             this.add();
                         } else if (this.type == 'edit') {
@@ -180,6 +144,9 @@
             }
         },
         watch: {
+            dialogVisible() {
+
+            },
             index() {
                 if (this.type == 'add') {
                     this.ruleForm.name = '';
@@ -193,24 +160,41 @@
 
 <style lang="scss">
   .appIcon {
+    .el-form-item__error {
+      top: 97%;
+    }
+
     .avatar-uploader {
       line-height: initial;
+
+      .el-upload--picture-card, .el-upload-list--picture-card .el-upload-list__item {
+        width: 60px;
+        height: 60px;
+        display: inline-block;
+      }
+
+      .el-upload-list--picture-card .el-upload-list__item-actions span + span {
+        margin-left: 5px;
+      }
     }
 
     .avatar-uploader .el-upload {
       border: 1px dashed #d9d9d9;
       border-radius: 6px;
+      width: 60px;
+      height: 60px;
       cursor: pointer;
       position: relative;
       overflow: hidden;
       line-height: initial;
+      box-sizing: border-box;
     }
 
     .avatar-uploader .el-upload:hover {
       border-color: #409EFF;
     }
 
-    .avatar-uploader-icon {
+    .avatar-uploader-icon, .el-upload--picture-card i {
       font-size: 18px;
       color: #8c939d;
       width: 60px;
@@ -220,10 +204,10 @@
     }
 
     .avatar {
-      width: 60px;
-      height: 60px;
+      width: 100%;
+      height: 100%;
       display: inline-block;
-      margin-right: 15px;
+      position: relative;
 
       img {
         position: absolute;

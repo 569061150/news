@@ -41,7 +41,7 @@
       <el-row>
         <el-col :span="12">
           <el-row type="flex" justify="start">
-            <el-button :disabled="tableData.length == 0" @click="setTypeSubmit({},'add','添加新应用')" type="primary"><i
+            <el-button :disabled="tableData.length == 1" @click="setTypeSubmit({},'add','添加新应用')" type="primary"><i
               class="el-icon-plus"></i> 添加应用
             </el-button>
           </el-row>
