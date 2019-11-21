@@ -3,7 +3,9 @@
 3. /blackWhiteList/equipment      应用推广       
 4. /reportForms/management   评价管理         
 5. /systemLogs/logs   意见反馈         
-6. /channel/appManagement   应用市场版本         
+6. /channel/appManagement   应用市场版本   
+7. /role/use_group_management  配置管理
+      
 
 
 // 蓝狐

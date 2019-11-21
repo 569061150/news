@@ -277,30 +277,34 @@ $dialogPaddingRight: 60px;
   margin: 0 3px 0 0;
 }
 
-.el-tabs__item {
-  background: #eaeaea;
-  padding: 0 20px;
-  height: auto;
-  line-height: 32px;
-  margin: 0 3px;
-  border: 0;
+
+.template-tabs {
+  .el-tabs__item {
+    background: #eaeaea;
+    padding: 0 20px;
+    height: auto;
+    line-height: 32px;
+    margin: 0 3px;
+    border: 0;
+  }
+
+  .el-tabs--card > .el-tabs__header .el-tabs__nav {
+    border-bottom: 0;
+  }
+
+  .el-tabs--card > .el-tabs__header .el-tabs__item.is-closable:hover {
+    width: auto;
+  }
+
+  .el-tabs--card > .el-tabs__header .el-tabs__item .el-icon-close {
+    width: auto !important;
+  }
+
+  .el-tabs--card > .el-tabs__header .el-tabs__item.is-closable:hover {
+    padding: 0 20px;
+  }
 }
 
-.el-tabs--card > .el-tabs__header .el-tabs__nav {
-  border-bottom: 0;
-}
-
-.el-tabs--card > .el-tabs__header .el-tabs__item.is-closable:hover {
-  width: auto;
-}
-
-.el-tabs--card > .el-tabs__header .el-tabs__item .el-icon-close {
-  width: auto !important;
-}
-
-.el-tabs--card > .el-tabs__header .el-tabs__item.is-closable:hover {
-  padding: 0 20px;
-}
 
 .el-message-box {
   vertical-align: top;
@@ -386,17 +390,21 @@ $dialogPaddingRight: 60px;
   text-align: center;
 }
 
-.ne-search{
+.ne-search {
   overflow: hidden;
 }
 
-.el-dialog{
-  max-width: 550px!important;
+.el-dialog {
+  max-width: 650px !important;
 }
 
-.el-dialog__body{
+.el-dialog__body {
   line-height: initial;
   text-align: left;
-  padding: 30px 50px;
+  //max-height: 700px;
+  //overflow: scroll;
+  padding: 3% 5%;
+  //padding: 30px 50px;
 }
+
 

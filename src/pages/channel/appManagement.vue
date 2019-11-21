@@ -109,7 +109,9 @@
     <el-dialog
       title="上传新版本"
       v-dialogDrag
-      :modal="false"
+      :modal="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape='true'
       :visible.sync="dialogVisible"
       width="40%"
     >
@@ -227,17 +229,20 @@
                     this.$message.error('上传文件大小不得小于5KB,不得大于100MB!')
                     return
                 }
-
                 this.submitUpload(file);
             },
             submitUpload(file) {
                 this.loading = true
                 let formData = new FormData();
                 formData.append("file", file.raw);
-                subjectUpload('http://backend-api-8081-xd-tsp-dev.xd-dev.nxengine.com/v1.0/subjectDown/subjectUpload', formData).then(res => {
+                subjectUpload(formData).then(res => {
                     this.loading = false
-                    this.documentsFileName = file.name
-                    this.ruleForm.documentsFile = res.data.data.url
+                    if (res.data.code == "000000") {
+                        this.documentsFileName = file.name
+                        this.ruleForm.documentsFile = res.data.data.url
+                    } else {
+                        this.$message.error(res.data.description)
+                    }
                 }).catch((err) => {
                     this.loading = false
                     this.documentsFileName = ""
@@ -307,7 +312,7 @@
                     //  a.download = '检测历史数据_' + new Date().getTime() + '.xlsx'; //命名下载名称
                     a.click(); //点击触发下载
                     window.URL.revokeObjectURL(url); //下载完成进行释放
-                    this.$message.error('导出失败');
+                    this.$message.success('导出成功');
                 }).catch((err) => {
                     console.log(err)
                 })

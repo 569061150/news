@@ -1,37 +1,26 @@
 <template>
   <div>
-
     <div class="ne-search">
       <el-form :inline="true" :model="formInline" ref="formInline" class="demo-form-inline">
-        <el-form-item label="应用id：" prop="id">
+        <el-form-item label="应用ID：" prop="id">
           <el-input size="medium" v-model="formInline.id" placeholder=""></el-input>
         </el-form-item>
         <el-form-item label="应用名称：" prop="name">
           <el-input size="medium" v-model="formInline.name" placeholder=""></el-input>
         </el-form-item>
-        <el-form-item label="应用分类：" prop="type">
-          <el-select v-model="formInline.type" placeholder="请选择">
+        <el-form-item label="应用分类：" prop="value">
+          <el-select v-model="formInline.value" placeholder="请选择">
+            <el-option label="全部" value=""></el-option>
             <el-option
-              v-for="item in typesArr"
+              v-for="item in options"
               :key="item.value"
               :label="item.label"
               :value="item.value">
             </el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="状态：" prop="states">
-          <el-select v-model="formInline.states" placeholder="请选择">
-            <el-option
-              v-for="item in statesArr"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
-        <el-form-item>
-          <el-button size="medium" type="primary" @click="submitForm()">查询</el-button>
+        <el-form-item style="float: right">
+          <el-button type="primary" size="medium" @click="submitForm()">查询</el-button>
           <el-button size="medium" @click="resetForm('formInline')">重置</el-button>
         </el-form-item>
       </el-form>
@@ -41,8 +30,10 @@
       <el-row>
         <el-col :span="12">
           <el-row type="flex" justify="start">
-            <el-button :disabled="tableData.length == 0" @click="setTypeSubmit({},'add','添加新应用')" type="primary"><i
-              class="el-icon-plus"></i> 添加应用
+            <el-button :disabled="tableData.length == 0" @click="setTypeSubmit(options,'add','增加推广')" type="primary"><i
+              class="el-icon-plus"></i> 增加推广
+            </el-button>
+            <el-button :disabled="tableData.length == 0" @click="toRouer({to:'info',tableData:tableData})"><i class="el-icon-sort"></i> 调整排序
             </el-button>
           </el-row>
         </el-col>
@@ -91,13 +82,10 @@
           <el-table-column
             label="操作"
             fixed="right"
-            width="230"
+            width="100"
           >
             <template slot-scope="scope">
-              <el-button @click="setTypeSubmit(scope.row,'edit','编辑应用信息')" type="text" size="small">编辑</el-button>
-              <el-button @click="setTypeSubmit(scope.row,'update','更新版本')" type="text" size="small">更新版本</el-button>
-              <el-button @click="upState(scope.row)" type="text" size="small">下架</el-button>
-              <el-button @click="toRouer({to:'info',row:scope.row})" type="text" size="small">安装包</el-button>
+              <el-button @click="setTypeSubmit(scope.row,'delete','提示')" type="text" size="small">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -117,20 +105,6 @@
       </div>
     </div>
 
-    <el-dialog
-      v-dialogDrag
-      title="提示"
-      :modal="true"
-      :visible="stateFix"
-      width="30%"
-    >
-      <div>确认{{stateinner}}该应用？</div>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="stateFix = false">取 消</el-button>
-        <el-button type="primary" @click="stateSubmit">确认</el-button>
-      </div>
-    </el-dialog>
-
     <Dialog :dialogVisible="dialogVisible" :type="type" :row="row" :title="title" :index="index"
             @dialogVisibleClose="dialogVisibleClose"></Dialog>
 
@@ -138,7 +112,7 @@
 </template>
 <script>
     import {mapState} from 'vuex';
-    import {getTableData} from '../../../api/typeManagement.js';
+    import {getTableData, getChannelNames} from '../../../../../api/typeManagement.js';
 
     export default {
         props: [],
@@ -147,47 +121,17 @@
         },
         data() {
             return {
-                stateFix: false,
-                stateinner: '',
                 index: 0,
                 dialogVisible: false,
                 type: '',
                 title: '',
                 row: {},
-                typesArr: [
-                    {
-                        value: '',
-                        label: '全部'
-                    },
-                    {
-                        value: '1',
-                        label: '影音娱乐'
-                    },
-                    {
-                        value: '2',
-                        label: '地图导航'
-                    }
-                ],
-                statesArr: [
-                    {
-                        value: '',
-                        label: '全部'
-                    },
-                    {
-                        value: '1',
-                        label: '上架'
-                    },
-                    {
-                        value: '2',
-                        label: '下架'
-                    }
-                ],
                 formInline: {
-                    name: '',
                     id: '',
-                    type: '',
-                    states: '',
+                    name: '',
+                    value: ''
                 },
+                options: [],
                 tableData: [],
                 paginationConfig: {
                     pageIndex: 1,
@@ -196,23 +140,32 @@
                 }
             };
         },
+        created() {
+            this.getListType();
+        },
         mounted() {
             this.getTableDataFn({
                 id: this.formInline.id,
                 name: this.formInline.name,
+                value: this.formInline.value,
                 pageSize: this.paginationConfig.pageSize,
                 pageNum: this.paginationConfig.pageIndex
-            })
+            });
         },
         methods: {
-            upState(row) {
-                console.log(row)
-                this.stateinner = row.id == 1 ? '上架' : '下架';
-                this.stateFix = true
-            },
-            stateSubmit(row) {
-                //  确认 上架/下架 接口
-                this.stateFix = false
+            getListType() {
+                getChannelNames().then(res => {
+                    if (res.data.code == 301000) {
+                        let channelNamesOptions = [];
+                        res.data.data.list.forEach(ele => {
+                            channelNamesOptions.push({
+                                value: ele,
+                                label: ele
+                            });
+                        });
+                        this.options = channelNamesOptions
+                    }
+                })
             },
             setTypeSubmit(row, type, title) {
                 this.index++
@@ -223,15 +176,19 @@
             },
             dialogVisibleClose(type) {
                 this.dialogVisible = false
-                this.getTableDataFn({
-                    name: '',
-                    id: '',
-                    pageSize: 1,
-                    pageNum: 10
-                })
+                if (type == 'addBtn' || type == 'deleteBtn') {
+                    this.getTableDataFn({
+                        id: this.formInline.id,
+                        name: this.formInline.name,
+                        value: this.formInline.value,
+                        pageSize: 10,
+                        pageNum: 1
+                    })
+                }
             },
             toRouer(type) {
                 this.$emit('change-route', type);
+                this.$store.commit('setIsTypeManagement');
             },
             handleSizeChange(val) {
                 console.log(`每页 ${val} 条`);
@@ -243,8 +200,6 @@
             handleCurrentChange(val) {
                 console.log(`当前页: ${val}`);
                 this.getTableDataFn({
-                    id: this.formInline.id,
-                    name: this.formInline.name,
                     pageSize: this.paginationConfig.pageSize,
                     pageNum: val
                 })
@@ -264,6 +219,7 @@
                 this.getTableDataFn({
                     id: this.formInline.id,
                     name: this.formInline.name,
+                    value: this.formInline.value,
                     pageSize: this.paginationConfig.pageSize,
                     pageNum: this.paginationConfig.pageIndex
                 })
@@ -284,8 +240,9 @@
                     id: ''
                 }
                 this.getTableDataFn({
-                    name: '',
                     id: '',
+                    name: '',
+                    value: '',
                     pageSize: this.paginationConfig.pageSize,
                     pageNum: this.paginationConfig.pageIndex
                 })

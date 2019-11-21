@@ -57,7 +57,7 @@
   </div>
 </template>
 <script>
-    import {getTableData} from '../../../api/typeManagement.js';
+    import {getTableData} from '../../../../../api/typeManagement.js';
 
     export default {
         props: ['dialogVisible', 'type', 'row', 'title', 'index'],

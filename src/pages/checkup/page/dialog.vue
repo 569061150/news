@@ -4,7 +4,7 @@
     <el-dialog
       v-dialogDrag
       :title="title"
-      :modal="false"
+      :modal="true"
       :visible="dialogVisible"
       width="30%"
       :before-close="dialogVisibleClose"

@@ -87,7 +87,7 @@
             >
               <template slot-scope="scope">
                 <el-button @click="setTypeSubmit(scope.row,'download')" type="text" size="small">下载</el-button>
-                <el-button @click="setTypeSubmit(scope.row,'del')" type="text" size="small">删除</el-button>
+<!--                <el-button @click="setTypeSubmit(scope.row,'del')" type="text" size="small">删除</el-button>-->
               </template>
             </el-table-column>
           </el-table>
@@ -111,7 +111,7 @@
     <el-dialog
       title="提示"
       v-dialogDrag
-      :modal="false"
+      :modal="true"
       :visible="dialogVisible"
       width="30%"
     >

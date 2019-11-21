@@ -4,44 +4,51 @@
       长城汽车
     </el-header>-->
     <el-col class="bg-box" :span="15">
-      <img class="bg" :src="imgBase+'/icon/login/bg.jpg'"/>
-      <img class="login" :src="imgBase+'/icon/login/logo.png'"/>
+      <img class="bg" :src="imgBase+'/icon/login/loginBg.png'"/>
     </el-col>
-    <el-col class="form-container" :span="9">
-      <div class="form-box">
-        <el-form :model="loginForm" :rules="rules" ref="loginForm" class="demo-loginForm">
-          <h1 class="title-container">V3车机应用商店后台管理系统</h1>
 
-          <el-form-item class="form-item-box" prop="userName">
-            <el-input
-              class="_beantech-input-box"
-              placeholder="请输入账户"
-              v-model="loginForm.userName"
-              prefix-icon="el-icon-user"
-              clearable
-            ></el-input>
-          </el-form-item>
-          <el-form-item class="form-item-box" prop="password">
-            <el-input
-              class="_beantech-input-box"
-              type="password"
-              placeholder="请输入密码"
-              v-model="loginForm.password"
-              prefix-icon="el-icon-lock"
-              clearable
-            ></el-input>
-          </el-form-item>
-          <el-form-item class="form-item-box" prop="sliderValue">
-            <SliderVerificationCode textColor='#000000' background='#e8e8e8' v-model="loginForm.sliderValue"
-                                    @change="handleChangeSlider"/>
-          </el-form-item>
-          <el-form-item class="form-item-box">
-            <el-button style="width: 100%;" type="primary" @click="submitForm('loginForm')">登 录</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
+    <div class="loginCenter">
+      <img class="mLog" :src="imgBase+'/icon/login/log.png'"/>
+      <img class="logintit" :src="imgBase+'/icon/login/logintit.png'"/>
+      <el-col class="form-container">
+        <div class="form-box">
+          <el-form :model="loginForm" :rules="rules" ref="loginForm" class="demo-loginForm">
+            <h1 class="title-container">欢迎登录车机应用管理平台</h1>
+
+            <el-form-item class="form-item-box" prop="userName">
+              <el-input
+                class="_beantech-input-box"
+                placeholder="请输入账户"
+                v-model="loginForm.userName"
+                prefix-icon="el-icon-user"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item class="form-item-box" prop="password">
+              <el-input
+                class="_beantech-input-box"
+                type="password"
+                placeholder="请输入密码"
+                v-model="loginForm.password"
+                prefix-icon="el-icon-lock"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item class="form-item-box" prop="sliderValue">
+              <SliderVerificationCode textColor='#000000' background='#e8e8e8' v-model="loginForm.sliderValue"
+                                      @change="handleChangeSlider"/>
+            </el-form-item>
+            <el-form-item class="form-item-box">
+              <el-button style="width: 100%;margin: 25px 0;" type="primary" @click="submitForm('loginForm')">登 录</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-col>
+
       <Footer></Footer>
-    </el-col>
+    </div>
+
+
   </el-row>
 </template>
 
@@ -1515,20 +1522,44 @@
     width: 100%;
     height: 100%;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+
+    .loginCenter {
+      width: 1000px;
+      margin: 0 auto;
+      height: 100%;
+      position: relative;
+      z-index: 2;
+
+      .mLog {
+        width: 134px;
+        margin-top: 15px;
+      }
+
+      .logintit {
+        position: absolute;
+        top: 50%;
+        left: 0%;
+        width: 50%;
+        transform: translateY(-50%);
+      }
+
+    }
+
 
     .bg-box {
-      position: relative;
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
 
       .bg {
         width: 100%;
+        height: 100%;
       }
 
-      .login {
-        position: absolute;
-        top: 4%;
-        left: 6%;
-        width: 18%;
-      }
+
     }
 
     .form-container {
@@ -1540,17 +1571,21 @@
       .title-container {
         text-align: center;
         letter-spacing: 2px;
-        font-size: 26px;
-        margin-bottom: 45px;
+        font-size: 18px;
+        margin: 40px 0;
+        color: #222628;
       }
 
       .form-box {
         position: absolute;
         width: 388px;
         margin: 0 auto;
-        left: 50%;
-        top: 45%;
-        transform: translateX(-50%) translateY(-50%);
+        right: 0%;
+        border-radius: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #fff;
+        box-shadow:0px 0px 20px 0px rgba(0,0,0,0.1);
       }
 
       .form-item-box {
