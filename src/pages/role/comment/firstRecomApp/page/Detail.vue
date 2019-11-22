@@ -2,34 +2,13 @@
   <div>
     <div class="ne-search">
       <el-form :inline="true" :model="formInline" ref="formInline" class="demo-form-inline">
-        <el-form-item label="名称：" prop="name">
-          <el-input size="medium" v-model="formInline.name" placeholder=""></el-input>
+        <el-form-item label="应用名称：" prop="appName">
+          <el-input size="medium" v-model="formInline.appName" placeholder=""></el-input>
         </el-form-item>
 
-        <el-form-item label="跳转类型：" prop="linkType">
-          <el-select v-model="formInline.linkType" placeholder="请选择">
-            <el-option label="全部" value=""></el-option>
-            <el-option
-              v-for="item in linkTypeArr"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
+        <el-form-item label="应用id：" prop="appId">
+          <el-input size="medium" v-model="formInline.appId" placeholder=""></el-input>
         </el-form-item>
-
-        <el-form-item label="状态：" prop="status">
-          <el-select v-model="formInline.status" placeholder="请选择">
-            <el-option label="全部" value=""></el-option>
-            <el-option
-              v-for="item in statusArr"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value">
-            </el-option>
-          </el-select>
-        </el-form-item>
-
 
         <el-form-item style="float: right">
           <el-button type="primary" size="medium" @click="submitForm()">查询</el-button>
@@ -38,13 +17,13 @@
       </el-form>
     </div>
 
+
     <div class="mTop20">
       <el-row>
         <el-col :span="12">
           <el-row type="flex" justify="start">
-            <el-button :disabled="tableData.length == 0" @click="setTypeSubmit({},'add','新增banner')"
-                       type="primary"><i
-              class="el-icon-plus"></i> 新增banner
+            <el-button :disabled="tableData.length == 0" @click="setTypeSubmit({},'add','选择应用')" type="primary"><i
+              class="el-icon-plus"></i> 添加应用
             </el-button>
             <el-button :disabled="tableData.length == 0" @click="toRouer({to:'info',tableData:tableData})"><i
               class="el-icon-sort"></i> 调整排序
@@ -96,11 +75,10 @@
           <el-table-column
             label="操作"
             fixed="right"
-            width="180"
+            width="100"
           >
             <template slot-scope="scope">
-              <el-button @click="setTypeSubmit(scope.row,'edit','编辑banner')" type="text" size="small">编辑</el-button>
-              <el-button @click="onlineNow(scope.row)" type="text" size="small">立即上线</el-button>
+              <el-button @click="setTypeSubmit(scope.row,'delete','提示')" type="text" size="small">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -142,27 +120,9 @@
                 title: '',
                 row: {},
                 formInline: {
-                    name: '',
-                    linkType: '',
-                    status: ''
+                    appName: '',
+                    appId: '',
                 },
-                linkTypeArr: [{
-                    label: "H5连接",
-                    value: "1"
-                }, {
-                    label: "应用详情页",
-                    value: "2"
-                }],
-                statusArr: [{
-                    label: "未上线",
-                    value: "1"
-                }, {
-                    label: "上线中",
-                    value: "2"
-                }, {
-                    label: "已下线",
-                    value: "3"
-                }],
                 tableData: [],
                 paginationConfig: {
                     pageIndex: 1,
@@ -172,21 +132,16 @@
             };
         },
         created() {
-
         },
         mounted() {
             this.getTableDataFn({
-                id: this.formInline.id,
-                name: this.formInline.name,
-                value: this.formInline.value,
+                appName: this.formInline.appName,
+                appId: this.formInline.appId,
                 pageSize: this.paginationConfig.pageSize,
                 pageNum: this.paginationConfig.pageIndex
             });
         },
         methods: {
-            onlineNow() {
-                alert('立即上线');
-            },
             setTypeSubmit(row, type, title) {
                 this.index++
                 this.title = title
@@ -198,9 +153,8 @@
                 this.dialogVisible = false
                 if (type == 'addBtn' || type == 'deleteBtn') {
                     this.getTableDataFn({
-                        id: this.formInline.id,
-                        name: this.formInline.name,
-                        value: this.formInline.value,
+                        appName: this.formInline.appName,
+                        appId: this.formInline.appId,
                         pageSize: 10,
                         pageNum: 1
                     })
@@ -237,9 +191,8 @@
             submitForm() {
                 console.log('submit!');
                 this.getTableDataFn({
-                    id: this.formInline.id,
-                    name: this.formInline.name,
-                    value: this.formInline.value,
+                    appName: this.formInline.appName,
+                    appId: this.formInline.appId,
                     pageSize: this.paginationConfig.pageSize,
                     pageNum: this.paginationConfig.pageIndex
                 })
@@ -256,13 +209,12 @@
         watch: {
             isTypeManagement() {
                 this.formInline = {
-                    name: '',
-                    id: ''
+                    appName: '',
+                    appId:'',
                 }
                 this.getTableDataFn({
-                    id: '',
-                    name: '',
-                    value: '',
+                    appName: '',
+                    appId:'',
                     pageSize: this.paginationConfig.pageSize,
                     pageNum: this.paginationConfig.pageIndex
                 })
@@ -273,4 +225,5 @@
 
 <style scoped lang="scss">
 </style>
+
 

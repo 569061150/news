@@ -39,7 +39,6 @@ service.interceptors.request.use(config => {
     config.headers['token'] = token;
   }
   return config
-
 }, error => {
   endLoading();
   return Promise.reject(error)

@@ -5,6 +5,8 @@
       v-dialogDrag
       :title="title"
       :modal="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape='true'
       :visible="dialogVisible"
       :before-close="dialogVisibleClose"
     >

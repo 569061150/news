@@ -1,55 +1,66 @@
 <template>
   <div>
-    <!--  增加分类 add / 编辑分类 edit  停用/启用 state   管理应用app  -->
+    <!--  新增banner  add / 编辑banner  edit   -->
     <el-dialog
       v-dialogDrag
       :title="title"
       :modal="true"
+      :close-on-click-modal="false"
+      :close-on-press-escape='true'
       :visible="dialogVisible"
       :before-close="dialogVisibleClose"
     >
 
-      <div v-if="type=='add'">
+      <div>
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
 
-          <el-form-item label="应用分类：" prop="value">
-            <el-select v-model="ruleForm.value" placeholder="请选择">
-              <el-option
-                v-for="item in row"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
+          <el-form-item label="名称：" prop="name">
+            <el-input v-model="ruleForm.name" maxlength="20" placeholder="不超过20个字符"></el-input>
           </el-form-item>
 
-          <el-form-item label="应用名称：" prop="name">
-            <el-select v-model="ruleForm.name" placeholder="请选择">
-              <el-option
-                v-for="item in row"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
-              </el-option>
-            </el-select>
+          <el-form-item class="appIcon" label="图片" prop="pic">
+            <dialogFile
+              ref="dialogFile1"
+              v-model="ruleForm.pic"
+              @getData="getAppIconData"
+              :limit="1"
+              :fileList="appIconFileList"
+            ></dialogFile>
           </el-form-item>
 
-          <el-form-item label="排序：" prop="sort">
-            <el-input style="width: 217px;" @input="handleChange" v-model="ruleForm.sort"
-                      placeholder="请输入大于0的整数"></el-input>
+          <el-form-item label="链接地址：" prop="links">
+            <el-input v-model="ruleForm.links" placeholder=""></el-input>
           </el-form-item>
+
+          <el-form-item label="上线时间：" prop="startTime">
+            <el-date-picker
+              v-model="ruleForm.startTime"
+              type="datetime"
+              placeholder="选择上线日期时间"
+              :picker-options="pickerOptionsStart"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              default-time="00:00:00">
+            </el-date-picker>
+          </el-form-item>
+
+          <el-form-item label="下线时间：" prop="endTime">
+            <el-date-picker
+              v-model="ruleForm.endTime"
+              type="datetime"
+              placeholder="选择下线日期时间"
+              :picker-options="pickerOptionsEnd"
+              value-format="yyyy-MM-dd HH:mm:ss"
+              default-time="00:00:00">
+            </el-date-picker>
+          </el-form-item>
+
+
         </el-form>
-      </div>
-
-      <div v-if="type=='delete'">
-        <div>确认删除该应用的推广？</div>
       </div>
 
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogVisibleClose(0)">取 消</el-button>
-        <!--   新增和编辑提交按钮     -->
-        <el-button v-if="type=='add'" type="primary" @click="submit('ruleForm')">保存</el-button>
-        <el-button v-if="type=='delete'" type="primary" @click="submit">确认</el-button>
+        <el-button type="primary" @click="submit('ruleForm')">保存</el-button>
       </div>
 
     </el-dialog>
@@ -61,37 +72,73 @@
 
     export default {
         props: ['dialogVisible', 'type', 'row', 'title', 'index'],
+        components: {
+            'dialogFile': () => import('../../../../../components/comment/dialogFile')
+        },
         data() {
             return {
+                width: "220px",
                 optionsName: [],
                 formLabelWidth: '100',
+                appIconFileList: [],  //  图标初始化
                 ruleForm: {
-                    value: '',
                     name: '',
-                    sort: ''
-                }
+                    pic: [],
+                    links: '',
+                    startTime: '',
+                    endTime: ''
+                },
+                pickerOptionsStart: {
+                    disabledDate: time => {
+                        if (this.ruleForm.endTime) {
+                            return (
+                                time.getTime() < Date.now() - 86400000
+                            );
+                        } else {
+                            return time.getTime() < Date.now() - 86400000;
+                        }
+                    }
+                },
+                pickerOptionsEnd: {
+                    disabledDate: time => {
+                        if (this.ruleForm.startTime) {
+                            return time.getTime() > Date.now() && time.getTime() < new Date(this.ruleForm.startTime).getTime()
+                        } else {
+                            return time.getTime() <= Date.now() - 86400000;
+                        }
+                    }
+                },
             };
         },
         computed: {
             rules() {
                 return {
-                    value: [
-                        {required: true, message: '请选择应用分类', trigger: 'change'}
-                    ],
                     name: [
-                        {required: true, message: '请选择应用名称', trigger: 'change'}
+                        {required: true, message: '请输入名称', trigger: 'blur'}
                     ],
-                    sort: [
-                        {required: true, message: '请填写排序', trigger: 'change'}
-                    ]
+                    pic: [
+                        {required: true, message: '请上传图片', trigger: 'change'}
+                    ],
+                    links: [
+                        {required: true, message: '请输入链接地址', trigger: 'blur'}
+                    ],
+                    startTime: [
+                        {required: true, message: '选择上线日期时间', trigger: 'blur'}
+                    ],
+                    endTime: [
+                        {required: true, message: '选择下线日期时间', trigger: 'blur'}
+                    ],
                 }
             }
         },
         mounted() {
         },
         methods: {
-            handleChange(value) {
-                this.ruleForm.sort = this.ruleForm.sort.replace(/[^\d]/g, '');
+            getAppIconData(obj) {
+                console.log("getAppIconData===")
+                console.log(obj)
+                this.ruleForm.pic = obj
+                this.$refs["ruleForm"].validateField('pic');
             },
             dialogVisibleClose(type) {
                 this.$emit('dialogVisibleClose', type);
@@ -100,34 +147,16 @@
                 // 增加分接口成功后 关闭弹窗 刷新列表
                 this.dialogVisibleClose('addBtn');
             },
-            delete() {
-                // 状态分接口成功后 关闭弹窗 刷新列表
-                // if (this.stateType) {
-                //     this.stateType = false
-                //     this.message = '请先将应用从该分类移除，再进行停用操作！'
-                // } else {
-                //     this.dialogVisibleClose('stateBtn');
-                // }
-                let aa = 1
-                if (aa) {
-                    this.$notify({
-                        title: '成功',
-                        message: '删除成功',
-                        type: 'success'
-                    });
-                    this.dialogVisibleClose('deleteBtn');
-                } else {
-                    this.$notify.error({
-                        title: '失败',
-                        message: '删除失败'
-                    });
-                    this.dialogVisibleClose(0);
-                }
+            edit() {
 
+                // 增加分接口成功后 关闭弹窗 刷新列表
+                this.dialogVisibleClose('addBtn');
             },
             submit(formName) {
                 if (this.type == 'add') {
+                    console.log(this.ruleForm)
                     this.$refs[formName].validate((valid) => {
+                        this.$refs[formName].validateField('pic');
                         if (valid) {
                             console.log(this.ruleForm)
                             if (this.type == 'add') {
@@ -149,8 +178,11 @@
                     this.ruleForm.name = '';
                     this.ruleForm.value = '';
                     this.ruleForm.sort = '';
-                } else if (this.type == 'delete') {
-                    console.log(this.row)
+                } else if (this.type == 'edit') {
+                    this.appIconFileList = [{
+                        name: 'food.jpeg',
+                        url: 'https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100'
+                    }]
                 }
             }
         }
