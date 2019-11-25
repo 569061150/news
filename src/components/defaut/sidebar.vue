@@ -10,7 +10,7 @@
           class="el-menu-vertical-demo text-left"
           @open="handleOpen"
           @close="handleClose"
-          background-color="#EDEDED"
+          background-color="#fff"
           router
           unique-opened
           @select="handleSelect"
@@ -133,9 +133,9 @@
   }
 
   .el-menu ul li.el-menu-item.is-active {
-    background: #ccc !important;
+    /*background: #ccc !important;*/
     border-left: 0;
-    color: #474747;
+    color: #2082ED;
     padding-left: 37px !important;
     img {
       opacity: 1;
@@ -154,7 +154,7 @@
     text-align: left;
   }
 
-  .itemSubs:hover {
-    background: none;
+  .itemSubs:hover:hover{
+    background: #ecf5ff!important;
   }
 </style>

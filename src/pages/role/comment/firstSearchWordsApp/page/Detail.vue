@@ -1,101 +1,57 @@
 <template>
   <div>
-    <div class="ne-search">
-      <el-form :inline="true" :model="formInline" ref="formInline" class="demo-form-inline">
-        <el-form-item label="应用名称：" prop="appName">
-          <el-input size="medium" v-model="formInline.appName" placeholder=""></el-input>
-        </el-form-item>
+    <el-row>
+      <el-col :span="12">
+        <el-row type="flex" justify="start">
+          <el-button :disabled="tableData.length == 0" @click="setTypeSubmit({},'add','新增文案')" type="primary"><i
+            class="el-icon-plus"></i> 添加
+          </el-button>
+          <el-button :disabled="tableData.length == 0" @click="toRouer({to:'info',tableData:tableData})"><i
+            class="el-icon-sort"></i> 调整排序
+          </el-button>
+        </el-row>
+      </el-col>
+    </el-row>
+    <div class="mTop20"></div>
+    <template>
+      <el-table
+        :data="tableData"
+        @sort-change="changeSort"
+        style="width: 100%">
+        <el-table-column
+          label="排序"
+          prop="createdAt"
+          :sortable="true"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="id"
+          label="文案"
+          :sortable="true"
+        >
+        </el-table-column>
+        <el-table-column
+          label="操作"
+        >
+          <template slot-scope="scope">
+            <el-button @click="setTypeSubmit(scope.row,'edit','编辑')" type="text" size="small">编辑</el-button>
+            <el-button @click="setTypeSubmit(scope.row,'delete','提示')" type="text" size="small">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </template>
 
-        <el-form-item label="应用id：" prop="appId">
-          <el-input size="medium" v-model="formInline.appId" placeholder=""></el-input>
-        </el-form-item>
-
-        <el-form-item style="float: right">
-          <el-button type="primary" size="medium" @click="submitForm()">查询</el-button>
-          <el-button size="medium" @click="resetForm('formInline')">重置</el-button>
-        </el-form-item>
-      </el-form>
-    </div>
-
-
-    <div class="mTop20">
-      <el-row>
-        <el-col :span="12">
-          <el-row type="flex" justify="start">
-            <el-button :disabled="tableData.length == 0" @click="setTypeSubmit({},'add','选择应用')" type="primary"><i
-              class="el-icon-plus"></i> 添加应用
-            </el-button>
-            <el-button :disabled="tableData.length == 0" @click="toRouer({to:'info',tableData:tableData})"><i
-              class="el-icon-sort"></i> 调整排序
-            </el-button>
-          </el-row>
-        </el-col>
-      </el-row>
-      <div class="mTop20"></div>
-      <template>
-        <el-table
-          :data="tableData"
-          style="width: 100%">
-          <el-table-column
-            label="序号"
-            width="100"
-            type="index"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="id"
-            label="分类ID"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="groupName"
-            label="分类名称"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="tenantId"
-            sortable
-            label="排序">
-          </el-table-column>
-          <el-table-column
-            prop="groupDesc"
-            sortable
-            show-overflow-tooltip
-            label="已上架应用">
-          </el-table-column>
-          <el-table-column
-            prop="groupName"
-            sortable
-            label="已下架应用">
-          </el-table-column>
-          <el-table-column
-            prop="address"
-            label="状态">
-          </el-table-column>
-          <el-table-column
-            label="操作"
-            fixed="right"
-            width="100"
-          >
-            <template slot-scope="scope">
-              <el-button @click="setTypeSubmit(scope.row,'delete','提示')" type="text" size="small">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-      </template>
-
-      <div class="pagination">
-        <el-pagination
-          background
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          :current-page="paginationConfig.pageIndex"
-          :page-size="paginationConfig.pageSize"
-          :page-sizes="[10, 20, 50, 100]"
-          layout="total, sizes, prev, pager, next, jumper"
-          :total="paginationConfig.total">
-        </el-pagination>
-      </div>
+    <div class="pagination">
+      <el-pagination
+        background
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="paginationConfig.pageIndex"
+        :page-size="paginationConfig.pageSize"
+        :page-sizes="[10, 20, 50, 100]"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="paginationConfig.total">
+      </el-pagination>
     </div>
 
     <Dialog :dialogVisible="dialogVisible" :type="type" :row="row" :title="title" :index="index" @dialogVisibleClose="dialogVisibleClose"></Dialog>
@@ -141,6 +97,10 @@
             });
         },
         methods: {
+            changeSort (val) {
+                console.log(val) // column: {…} order: "ascending" prop: "date"
+                // 根据当前排序重新获取后台数据,一般后台会需要一个排序的参数
+            },
             setTypeSubmit(row, type, title) {
                 this.index++
                 this.title = title

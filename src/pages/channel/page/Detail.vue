@@ -131,7 +131,7 @@
       </div>
     </el-dialog>
 
-    <Dialog :dialogVisible="dialogVisible" :type="type" :row="row" :title="title" :index="index"
+    <Dialog  :dialogVisible="dialogVisible" :type="type" :row="row" :title="title" :index="index"
             @dialogVisibleClose="dialogVisibleClose"></Dialog>
 
   </div>

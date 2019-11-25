@@ -14,17 +14,20 @@
       <div class="mTop20"></div>
       <template>
         <el-table
+          border
+          stripe
           :data="tableData"
-          style="width: 100%">
+          style="width: 100%; text-align: center;">
           <el-table-column
             label="序号"
             type="index"
-            width="50">
+            width="150"
+          >
           </el-table-column>
           <el-table-column
             prop="groupCode"
             label="分类ID"
-            width="180">
+         >
           </el-table-column>
           <el-table-column
             prop="id"

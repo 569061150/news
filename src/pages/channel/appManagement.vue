@@ -1,108 +1,105 @@
 <template>
-  <div class="addCs">
+  <div class="pageBar page-type-management addCs">
+
+    <div class="ne-search">
+      <el-form :inline="true" :model="formInline" ref="formInline" class="demo-form-inline">
+        <el-form-item label="版本号：" prop="version">
+          <el-input size="medium" v-model="formInline.version" placeholder=""></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button size="medium" type="primary" @click="submitForm()">查询</el-button>
+          <el-button size="medium" @click="resetForm('formInline')">重置</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
 
     <div class="mTop20">
 
-      <div class="ne-search">
-        <el-form :inline="true" :model="formInline" ref="formInline" class="demo-form-inline">
-          <el-form-item label="版本号：" prop="version">
-            <el-input size="medium" v-model="formInline.version" placeholder=""></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button size="medium" type="primary" @click="submitForm()">查询</el-button>
-            <el-button size="medium" @click="resetForm('formInline')">重置</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
+      <el-row>
+        <el-col :span="12">
+          <el-row type="flex" justify="start">
+            <el-button :disabled="tableData.length == 0" @click="dialogVisible = true" type="primary"><i
+              class="el-icon-plus"></i> 上传新版本
+            </el-button>
+          </el-row>
+        </el-col>
+      </el-row>
 
-      <div class="mTop20">
+      <template>
+        <el-table
+          :data="tableData"
+          style="width: 100%">
+          <el-table-column
+            label="序号"
+            width="100"
+            type="index"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="id"
+            label="分类ID"
+          >
+          </el-table-column>
+          <el-table-column
+            prop="groupName"
+            label="分类名称"
+          >
+            <template slot-scope="scope">
+              <el-popover
+                placement="top"
+                title="更新说明"
+                width="250"
+              >
+                <p>1.【动态】发现页升级为动态页面，来这里了解你关注歌手的新歌，还有你关注的歌手、达人的最新动态 ？</p>
+                <p>2.【搜索】热搜改版，查找最新热门内容更实时更丰富</p>
+                <p>3.优化了自定义皮肤下的显示效果</p>
+                <span class="lookInfo" slot="reference">查看</span>
+              </el-popover>
+            </template>
+          </el-table-column>
+          <el-table-column
+            prop="tenantId"
+            sortable
+            label="排序">
+          </el-table-column>
+          <el-table-column
+            prop="groupDesc"
+            sortable
+            show-overflow-tooltip
+            label="已上架应用">
+          </el-table-column>
+          <el-table-column
+            prop="groupName"
+            sortable
+            label="已下架应用">
+          </el-table-column>
+          <el-table-column
+            prop="address"
+            label="状态">
+          </el-table-column>
+          <el-table-column
+            label="操作"
+            fixed="right"
+            width="100"
+          >
+            <template slot-scope="scope">
+              <el-button @click="setTypeSubmit(scope.row,'download')" type="text" size="small">下载</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </template>
 
-        <el-row>
-          <el-col :span="12">
-            <el-row type="flex" justify="start">
-              <el-button :disabled="tableData.length == 0" @click="dialogVisible = true" type="primary"><i
-                class="el-icon-plus"></i> 上传新版本
-              </el-button>
-            </el-row>
-          </el-col>
-        </el-row>
-
-        <template>
-          <el-table
-            :data="tableData"
-            style="width: 100%">
-            <el-table-column
-              label="序号"
-              width="100"
-              type="index"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="id"
-              label="分类ID"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="groupName"
-              label="分类名称"
-            >
-              <template slot-scope="scope">
-                <el-popover
-                  placement="top"
-                  title="更新说明"
-                  width="250"
-                >
-                  <p>1.【动态】发现页升级为动态页面，来这里了解你关注歌手的新歌，还有你关注的歌手、达人的最新动态 ？</p>
-                  <p>2.【搜索】热搜改版，查找最新热门内容更实时更丰富</p>
-                  <p>3.优化了自定义皮肤下的显示效果</p>
-                  <span class="lookInfo" slot="reference">查看</span>
-                </el-popover>
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="tenantId"
-              sortable
-              label="排序">
-            </el-table-column>
-            <el-table-column
-              prop="groupDesc"
-              sortable
-              show-overflow-tooltip
-              label="已上架应用">
-            </el-table-column>
-            <el-table-column
-              prop="groupName"
-              sortable
-              label="已下架应用">
-            </el-table-column>
-            <el-table-column
-              prop="address"
-              label="状态">
-            </el-table-column>
-            <el-table-column
-              label="操作"
-              fixed="right"
-              width="100"
-            >
-              <template slot-scope="scope">
-                <el-button @click="setTypeSubmit(scope.row,'download')" type="text" size="small">下载</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </template>
-
-        <div class="pagination">
-          <el-pagination
-            background
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange"
-            :current-page="paginationConfig.pageIndex"
-            :page-size="paginationConfig.pageSize"
-            :page-sizes="[10, 20, 50, 100]"
-            layout="total, sizes, prev, pager, next, jumper"
-            :total="paginationConfig.total">
-          </el-pagination>
-        </div>
+      <div class="pagination">
+        <el-pagination
+          background
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="paginationConfig.pageIndex"
+          :page-size="paginationConfig.pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="paginationConfig.total">
+        </el-pagination>
       </div>
     </div>
 
@@ -110,6 +107,7 @@
       title="上传新版本"
       v-dialogDrag
       :modal="true"
+      :append-to-body="true"
       :close-on-click-modal="false"
       :close-on-press-escape='true'
       :visible.sync="dialogVisible"
@@ -229,6 +227,7 @@
                     this.$message.error('上传文件大小不得小于5KB,不得大于100MB!')
                     return
                 }
+
                 this.submitUpload(file);
             },
             submitUpload(file) {
@@ -240,6 +239,7 @@
                     if (res.data.code == "000000") {
                         this.documentsFileName = file.name
                         this.ruleForm.documentsFile = res.data.data.url
+                        this.$refs["ruleForm"].validateField('documentsFile');
                     } else {
                         this.$message.error(res.data.description)
                     }

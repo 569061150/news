@@ -32,7 +32,10 @@
       <div class="mTop20"></div>
       <template>
         <el-table
+          border
+          stripe
           :data="tableData"
+          @sort-change="changeSort"
           style="width: 100%">
           <el-table-column
             label="序号"
@@ -43,6 +46,7 @@
           <el-table-column
             prop="id"
             label="分类ID"
+            :sortable="true"
           >
           </el-table-column>
           <el-table-column
@@ -106,130 +110,134 @@
   </div>
 </template>
 <script>
-  import {mapState} from 'vuex';
-  import {getTableData} from '../../../api/typeManagement.js';
+    import {mapState} from 'vuex';
+    import {getTableData} from '../../../api/typeManagement.js';
 
-  export default {
-    props: [],
-    components: {
-      'Dialog': () => import('./dialog')
-    },
-    data() {
-      return {
-        index: 0,
-        dialogVisible: false,
-        type: '',
-        title: '',
-        row: {},
-        formInline: {
-          name: '',
-          id: ''
+    export default {
+        props: [],
+        components: {
+            'Dialog': () => import('./dialog')
         },
-        tableData: [],
-        paginationConfig: {
-          pageIndex: 1,
-          pageSize: 10,
-          total: 0
-        }
-      };
-    },
-    mounted() {
-      this.getTableDataFn({
-        id: this.formInline.id,
-        name: this.formInline.name,
-        pageSize: this.paginationConfig.pageSize,
-        pageNum: this.paginationConfig.pageIndex
-      })
-    },
-    methods: {
-      goLink(to) {
-        console.log(to.groupName);
-        this.$router.push({
-          name: '/systemLogs/logs',
-          params: {id: to.groupName}
-        });
-      },
-      setTypeSubmit(row, type, title) {
-        this.index++
-        this.title = title
-        this.type = type
-        this.row = row;
-        this.dialogVisible = true
-      },
-      dialogVisibleClose(type) {
-        this.dialogVisible = false
-        if (type == 'addBtn' || type == 'editBtn') {
-          this.getTableDataFn({
-            name: '',
-            id: '',
-            pageSize: 1,
-            pageNum: 10
-          })
-        }
-      },
-      toRouer(type) {
-        this.$emit('change-route', type);
-        this.$store.commit('setIsTypeManagement');
-      },
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
-        this.getTableDataFn({
-          pageSize: val,
-          pageNum: this.paginationConfig.pageIndex
-        })
-      },
-      handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
-        this.getTableDataFn({
-          id: this.formInline.id,
-          name: this.formInline.name,
-          pageSize: this.paginationConfig.pageSize,
-          pageNum: val
-        })
-      },
-      getTableDataFn(params) {
-        getTableData(params).then(res => {
-            if (res.data.code == 301000) {
-                this.tableData = res.data.data.list;
-                this.paginationConfig.total = res.data.data.total;
-                this.paginationConfig.pageIndex = res.data.data.pageNum;
-                this.paginationConfig.pageSize = res.data.data.pageSize;
+        data() {
+            return {
+                index: 0,
+                dialogVisible: false,
+                type: '',
+                title: '',
+                row: {},
+                formInline: {
+                    name: '',
+                    id: ''
+                },
+                tableData: [],
+                paginationConfig: {
+                    pageIndex: 1,
+                    pageSize: 10,
+                    total: 0
+                }
+            };
+        },
+        mounted() {
+            this.getTableDataFn({
+                id: this.formInline.id,
+                name: this.formInline.name,
+                pageSize: this.paginationConfig.pageSize,
+                pageNum: this.paginationConfig.pageIndex
+            })
+        },
+        methods: {
+            changeSort(val) {
+                console.log(val) // column: {…} order: "ascending" prop: "date"
+                // 根据当前排序重新获取后台数据,一般后台会需要一个排序的参数
+            },
+            goLink(to) {
+                console.log(to.groupName);
+                this.$router.push({
+                    name: '/systemLogs/logs',
+                    params: {id: to.groupName}
+                });
+            },
+            setTypeSubmit(row, type, title) {
+                this.index++
+                this.title = title
+                this.type = type
+                this.row = row;
+                this.dialogVisible = true
+            },
+            dialogVisibleClose(type) {
+                this.dialogVisible = false
+                if (type == 'addBtn' || type == 'editBtn') {
+                    this.getTableDataFn({
+                        name: '',
+                        id: '',
+                        pageSize: 1,
+                        pageNum: 10
+                    })
+                }
+            },
+            toRouer(type) {
+                this.$emit('change-route', type);
+                this.$store.commit('setIsTypeManagement');
+            },
+            handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+                this.getTableDataFn({
+                    pageSize: val,
+                    pageNum: this.paginationConfig.pageIndex
+                })
+            },
+            handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+                this.getTableDataFn({
+                    id: this.formInline.id,
+                    name: this.formInline.name,
+                    pageSize: this.paginationConfig.pageSize,
+                    pageNum: val
+                })
+            },
+            getTableDataFn(params) {
+                getTableData(params).then(res => {
+                    if (res.data.code == 301000) {
+                        this.tableData = res.data.data.list;
+                        this.paginationConfig.total = res.data.data.total;
+                        this.paginationConfig.pageIndex = res.data.data.pageNum;
+                        this.paginationConfig.pageSize = res.data.data.pageSize;
+                    }
+                });
+            },
+            submitForm() {
+                console.log('submit!');
+                this.getTableDataFn({
+                    id: this.formInline.id,
+                    name: this.formInline.name,
+                    pageSize: this.paginationConfig.pageSize,
+                    pageNum: this.paginationConfig.pageIndex
+                })
+            },
+            resetForm(formName) {
+                this.$refs[formName].resetFields();
             }
-        });
-      },
-      submitForm() {
-        console.log('submit!');
-        this.getTableDataFn({
-          id: this.formInline.id,
-          name: this.formInline.name,
-          pageSize: this.paginationConfig.pageSize,
-          pageNum: this.paginationConfig.pageIndex
-        })
-      },
-      resetForm(formName) {
-        this.$refs[formName].resetFields();
-      }
-    },
-    computed: {
-      ...mapState({
-        isTypeManagement: state => state.common.isTypeManagement
-      })
-    },
-    watch: {
-      isTypeManagement() {
-        this.formInline = {
-          name: '',
-          id: ''
+        },
+        computed: {
+            ...mapState({
+                isTypeManagement: state => state.common.isTypeManagement
+            })
+        },
+        watch: {
+            isTypeManagement() {
+                this.formInline = {
+                    name: '',
+                    id: ''
+                }
+                this.getTableDataFn({
+                    name: '',
+                    id: '',
+                    pageSize: this.paginationConfig.pageSize,
+                    pageNum: this.paginationConfig.pageIndex
+                })
+            }
         }
-        this.getTableDataFn({
-          name: '',
-          id: '',
-          pageSize: this.paginationConfig.pageSize,
-          pageNum: this.paginationConfig.pageIndex
-        })
-      }
-    }
-  };
+    };
 </script>
 
 <style scoped lang="scss">

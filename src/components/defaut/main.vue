@@ -191,8 +191,8 @@
 
   .el-aside {
     transition: width 0.5s;
-    background-color: #EDEDED;
-    -webkit-box-shadow: 1px 0px 2px 1px #d4d7d9;
+    background-color: #fff;
+    -webkit-box-shadow: 0px 0px 1px 1px #d4d7d9;
     z-index: 2;
   }
 
@@ -223,9 +223,9 @@
   }
 
   .el-button:focus, .el-button:hover {
-    color: #d5716d;
+    color: #2082ED;
     background-color: white;
-    border-color: #d5716d;
+    border-color: #2082ED;
   }
 
  .el-header {
@@ -233,7 +233,7 @@
     background-color: #fff;
     color: #333;
     text-align: center;
-    line-height: 50px;
+    line-height: 60px;
     box-shadow: 0px 1px 0px 0px #d4d7d9;
     position: relative;
     z-index: 2;
@@ -265,6 +265,7 @@
     margin-bottom: 0;
     height: 100%;
     width: 100%;
+    z-index: 1;
   }
 
   .el-message-box {

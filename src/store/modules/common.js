@@ -11,6 +11,7 @@ const common = {
       state.cancelTokenArr.push(payload.cancelToken)
     },
     clearToken({cancelTokenArr}) {
+      console.log(cancelTokenArr)
       cancelTokenArr.forEach(item => {
         item('路由跳转取消请求')
       });

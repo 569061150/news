@@ -5,9 +5,11 @@
       v-dialogDrag
       :title="title"
       :modal="true"
+      :append-to-body="true"
       :close-on-click-modal="false"
       :close-on-press-escape='true'
       :visible="dialogVisible"
+      width="40%"
       :before-close="dialogVisibleClose"
     >
 

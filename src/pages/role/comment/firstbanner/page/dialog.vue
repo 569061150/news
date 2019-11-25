@@ -5,6 +5,7 @@
       v-dialogDrag
       :title="title"
       :modal="true"
+      :append-to-body="true"
       :close-on-click-modal="false"
       :close-on-press-escape='true'
       :visible="dialogVisible"
@@ -39,7 +40,7 @@
               placeholder="选择上线日期时间"
               :picker-options="pickerOptionsStart"
               value-format="yyyy-MM-dd HH:mm:ss"
-              default-time="00:00:00">
+              :default-time="defaultTime">
             </el-date-picker>
           </el-form-item>
 
@@ -88,26 +89,25 @@
                     startTime: '',
                     endTime: ''
                 },
+                defaultTime: new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds(),
                 pickerOptionsStart: {
                     disabledDate: time => {
                         if (this.ruleForm.endTime) {
-                            return (
-                                time.getTime() < Date.now() - 86400000
-                            );
+                            return time.getTime() > new Date(this.ruleForm.endTime).getTime() || time.getTime() < new Date().getTime() - 86400000
                         } else {
-                            return time.getTime() < Date.now() - 86400000;
+                            return time.getTime() < (new Date() - 86400000);
                         }
                     }
                 },
                 pickerOptionsEnd: {
                     disabledDate: time => {
                         if (this.ruleForm.startTime) {
-                            return time.getTime() > Date.now() && time.getTime() < new Date(this.ruleForm.startTime).getTime()
+                            return time.getTime() < new Date(this.ruleForm.startTime).getTime()
                         } else {
-                            return time.getTime() <= Date.now() - 86400000;
+                            return time.getTime() <= (new Date() - 86400000);
                         }
                     }
-                },
+                }
             };
         },
         computed: {

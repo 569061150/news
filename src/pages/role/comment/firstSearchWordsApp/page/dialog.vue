@@ -9,30 +9,27 @@
       :close-on-click-modal="false"
       :close-on-press-escape='true'
       :visible="dialogVisible"
-      width="30%"
       :before-close="dialogVisibleClose"
+      width="20%"
     >
+
       <div v-if="type=='add' || type=='edit'">
-        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="90px" class="demo-ruleForm">
-          <el-form-item v-if="type=='add'" label="分类名称" prop="name">
-            <el-input v-model="ruleForm.name" placeholder="请输入分类名称，10字以内"></el-input>
-          </el-form-item>
-          <el-form-item v-if="type=='edit'" label="分类名称" prop="name">
-            <el-input v-model="ruleForm.name" placeholder="请输入分类名称，10字以内"></el-input>
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
+          <el-form-item label="文案：" prop="name">
+            <el-input v-model="ruleForm.name" maxlength="20" placeholder="不超过20个字符"></el-input>
           </el-form-item>
         </el-form>
       </div>
 
-      <div v-if="type=='state'">
-        <div v-if="stateType">确认{{stateText}}该分类？</div>
-        <div v-if="!stateType">{{message}}</div>
+      <div v-if="type=='delete'">
+        <div>确认删除该应用的推广？</div>
       </div>
 
       <div slot="footer" class="dialog-footer">
-        <el-button v-if="stateType" @click="dialogVisibleClose(0)">取 消</el-button>
+        <el-button @click="dialogVisibleClose(0)">取 消</el-button>
         <!--   新增和编辑提交按钮     -->
-        <el-button v-if="type=='add' || type=='edit'" type="primary" @click="submit('ruleForm')">保存</el-button>
-        <el-button v-if="type=='state'" type="primary" @click="submit">确认</el-button>
+        <el-button v-if="type=='add'" type="primary" @click="submit('ruleForm')">保存</el-button>
+        <el-button v-if="type=='delete'  || type=='edit'" type="primary" @click="submit">确认</el-button>
       </div>
 
     </el-dialog>
@@ -40,17 +37,16 @@
   </div>
 </template>
 <script>
-    import {getTableData} from '../../../api/typeManagement.js';
+    import {getTableData} from '../../../../../api/typeManagement.js';
 
     export default {
         props: ['dialogVisible', 'type', 'row', 'title', 'index'],
         data() {
             return {
-                stateType: true,
-                message: '',
-                stateText: '启用',
+                optionsName: [],
+                formLabelWidth: '100',
                 ruleForm: {
-                    name: ''
+                    name: '',
                 }
             };
         },
@@ -58,13 +54,10 @@
             rules() {
                 return {
                     name: [
-                        {required: true, message: '请输入活动名称', trigger: 'blur'},
-                        {max: 10000, message: '长度在 10 个字符以内', trigger: 'blur'}
-                    ]
+                        {required: true, message: '请选择应用名称', trigger: 'change'}
+                    ],
                 }
             }
-        },
-        mounted() {
         },
         methods: {
             dialogVisibleClose(type) {
@@ -73,29 +66,55 @@
             add() {
                 // 增加分接口成功后 关闭弹窗 刷新列表
                 this.dialogVisibleClose('addBtn');
+                this.$notify({
+                    title: '成功',
+                    message: '增加成功',
+                    type: 'success'
+                });
             },
             edit() {
                 // 编辑分接口成功后 关闭弹窗 刷新列表
-                this.dialogVisibleClose('editBtn');
+                this.dialogVisibleClose('addBtn');
+                this.$notify({
+                    title: '成功',
+                    message: '编辑成功',
+                    type: 'success'
+                });
             },
-            state() {
+            delete() {
                 // 状态分接口成功后 关闭弹窗 刷新列表
-                //
-                if (this.stateType) {
-                    this.stateType = false
-                    this.message = '请先将应用从该分类移除，再进行停用操作！'
+                // if (this.stateType) {
+                //     this.stateType = false
+                //     this.message = '请先将应用从该分类移除，再进行停用操作！'
+                // } else {
+                //     this.dialogVisibleClose('stateBtn');
+                // }
+                let aa = 1
+                if (aa) {
+                    this.$notify({
+                        title: '成功',
+                        message: '删除成功',
+                        type: 'success'
+                    });
+                    this.dialogVisibleClose('deleteBtn');
                 } else {
-                    this.dialogVisibleClose('stateBtn');
+                    this.$notify.error({
+                        title: '失败',
+                        message: '删除失败'
+                    });
+                    this.dialogVisibleClose(0);
                 }
+
             },
             submit(formName) {
                 if (this.type == 'add' || this.type == 'edit') {
+                    formName = 'ruleForm'
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
                             console.log(this.ruleForm)
                             if (this.type == 'add') {
                                 this.add();
-                            } else if (this.type == 'edit') {
+                            } else {
                                 this.edit();
                             }
                         } else {
@@ -103,8 +122,8 @@
                             return false;
                         }
                     });
-                } else if (this.type == 'state') {
-                    this.state();
+                } else if (this.type == 'delete') {
+                    this.delete();
                 }
             }
         },
@@ -114,14 +133,10 @@
                     this.ruleForm.name = '';
                 } else if (this.type == 'edit') {
                     console.log(this.row)
-                    this.ruleForm.name = this.row.groupName;
-                } else if (this.type == 'state') {
-                    this.stateType = true
-                    this.message = ''
+                    this.ruleForm.name = this.row.groupName
+                } else if (this.type == 'delete') {
                     console.log(this.row)
-                    this.stateText = this.row.groupCode == 'admin' ? '启用' : '停用';
                 }
-                console.log(this.index)
             }
         }
     };

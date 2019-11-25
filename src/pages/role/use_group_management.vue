@@ -11,22 +11,20 @@
               <FirstRecomApp v-if="activeName == 'page1'"></FirstRecomApp>
             </el-tab-pane>
             <el-tab-pane label="猜你喜欢应用" name="page2">
-              猜你喜欢应用
+              <FirstLikeApp v-if="activeName == 'page2'"></FirstLikeApp>
             </el-tab-pane>
             <el-tab-pane label="热门搜索应用" name="page3">
-              热门搜索应用
+              <FirstSearchApp v-if="activeName == 'page3'"></FirstSearchApp>
             </el-tab-pane>
             <el-tab-pane label="热门搜索文案" name="page4">
-              热门搜索文案
+              <FirstSearchWordsApp v-if="activeName == 'page4'"></FirstSearchWordsApp>
             </el-tab-pane>
             <el-tab-pane label="联系我们" name="page5">
-              联系我们
+              <FirstContactUsApp v-if="activeName == 'page5'"></FirstContactUsApp>
             </el-tab-pane>
           </el-tabs>
         </template>
       </nav>
-
-
 
 
     </div>
@@ -34,23 +32,28 @@
 </template>
 
 <script>
-
-
     export default {
         name: 'login',
         components: {
             'FirstBanner': () => import('./comment/firstbanner/index'),
             'FirstRecomApp': () => import('./comment/firstRecomApp/index'),
+            'FirstLikeApp': () => import('./comment/firstLikeApp/index'),
+            'FirstSearchApp': () => import('./comment/firstSearchApp/index'),
+            'FirstSearchWordsApp': () => import('./comment/firstSearchWordsApp/index'),
+            'FirstContactUsApp': () => import('./comment/firstContactUsApp/index'),
         },
         data() {
             return {
-                activeName: 'page0'
+                activeName: sessionStorage.getItem("activeName") || 'page0'
             };
         },
         methods: {
             handleClick(tab, event) {
                 this.activeName = "page" + tab.index
+                sessionStorage.setItem("activeName", this.activeName)
             }
+        },
+        mounted() {
         },
         watch: {},
         computed: {}
