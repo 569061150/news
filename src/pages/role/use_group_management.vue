@@ -1,6 +1,7 @@
 <template>
   <div class="container">
-    <div class="info_inner">
+
+    <div class="pageBar page-type-management">
       <nav>
         <template>
           <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -61,10 +62,4 @@
 </script>
 
 <style scoped lang="scss">
-  .info_inner {
-    nav {
-      margin: 20px 10px;
-    }
-  }
-
 </style>

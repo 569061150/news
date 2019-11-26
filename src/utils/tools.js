@@ -83,6 +83,7 @@ export const unique = (arr) => {
   return newArr;
 }
 
+// 筛选重复的数据
 export const find_repeat = (key, data, cb) => {
   let is_check = [];
   for (let i = 0; i < data.length; i++) {
@@ -93,10 +94,46 @@ export const find_repeat = (key, data, cb) => {
         is_repeat = true;
         cb(j, data[j])
       }
-     // console.log(data[j][key],data[i][key],is_check.indexOf(j))
+      // console.log(data[j][key],data[i][key],is_check.indexOf(j))
     }
     if (is_repeat) {
       cb(i, data[i])
     }
   }
 }
+
+//  时分秒转化时间戳
+export const time_to_sec = (time) => {
+  var s = '';
+  var hour = time.split(':')[0];
+  var min = time.split(':')[1];
+  var sec = time.split(':')[2];
+  s = Number(hour * 3600) + Number(min * 60) + Number(sec);
+  return s;
+}
+
+
+//  获取当前日期时分秒加n分钟
+export const MinutesTest = (n) => {
+  var sdate1 = new Date();
+  sdate1.setMinutes(sdate1.getMinutes() + n);
+  var now = sdate1.getHours() + ":" + sdate1.getMinutes();
+  return now;
+}
+
+//  时间戳转 日期格式
+export const formatDate = (now, type) => {
+  var now=new Date(now);
+  var year = now.getFullYear();
+  var month = now.getMonth() + 1;
+  var date = now.getDate();
+  var hour = now.getHours();
+  var minute = now.getMinutes();
+  var second = now.getSeconds();
+  if (type == 0) {
+    return year + "-" + month + "-" + date;
+  } else {
+    return year + "-" + month + "-" + date + " " + hour + ":" + minute + ":" + second;
+  }
+}
+

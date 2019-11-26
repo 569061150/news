@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="pageBar page-type-management">
     <div class="ne-search">
       <el-form :inline="true" :model="formInline" ref="formInline" class="demo-form-inline">
         <el-form-item label="应用商店版本号：" prop="appVersion">

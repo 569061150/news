@@ -9,6 +9,8 @@
       :close-on-click-modal="false"
       :close-on-press-escape='true'
       :visible="dialogVisible"
+      v-if="dialogVisible"
+      width="40%"
       :before-close="dialogVisibleClose"
     >
 
@@ -40,7 +42,8 @@
               placeholder="选择上线日期时间"
               :picker-options="pickerOptionsStart"
               value-format="yyyy-MM-dd HH:mm:ss"
-              :default-time="defaultTime">
+              :editable="false"
+              default-time="00:00:00">
             </el-date-picker>
           </el-form-item>
 
@@ -51,6 +54,7 @@
               placeholder="选择下线日期时间"
               :picker-options="pickerOptionsEnd"
               value-format="yyyy-MM-dd HH:mm:ss"
+              :editable="false"
               default-time="00:00:00">
             </el-date-picker>
           </el-form-item>
@@ -70,6 +74,9 @@
 </template>
 <script>
     import {getTableData} from '../../../../../api/typeManagement.js';
+    import {time_to_sec, MinutesTest, formatDate} from '@/utils/tools.js';
+    //上线时间： 如果是当天  时分秒为 当前时间+ 5分钟
+    //    下线时间： 如果是当天 时分秒为  当前时间+ 5分钟
 
     export default {
         props: ['dialogVisible', 'type', 'row', 'title', 'index'],
@@ -86,25 +93,24 @@
                     name: '',
                     pic: [],
                     links: '',
-                    startTime: '',
-                    endTime: ''
+                    startTime: formatDate(new Date().getTime() + 5 * 60 * 1000) || "",
+                    endTime: ""
                 },
-                defaultTime: new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds(),
                 pickerOptionsStart: {
                     disabledDate: time => {
                         if (this.ruleForm.endTime) {
                             return time.getTime() > new Date(this.ruleForm.endTime).getTime() || time.getTime() < new Date().getTime() - 86400000
                         } else {
-                            return time.getTime() < (new Date() - 86400000);
+                            return time.getTime() < (new Date().getTime() - 86400000);
                         }
                     }
                 },
                 pickerOptionsEnd: {
                     disabledDate: time => {
                         if (this.ruleForm.startTime) {
-                            return time.getTime() < new Date(this.ruleForm.startTime).getTime()
+                            return time.getTime() < new Date(this.ruleForm.startTime).getTime() - 86400000
                         } else {
-                            return time.getTime() <= (new Date() - 86400000);
+                            return time.getTime() <= (new Date().getTime() - 86400000);
                         }
                     }
                 }
@@ -123,10 +129,36 @@
                         {required: true, message: '请输入链接地址', trigger: 'blur'}
                     ],
                     startTime: [
-                        {required: true, message: '选择上线日期时间', trigger: 'blur'}
+                        {required: true, message: '选择上线日期时间', trigger: 'blur'},
+                        {
+                            validator: (rule, value, callback) => {
+                                let now = new Date().getTime();
+                                if (now > new Date(this.ruleForm.startTime).getTime()) {
+                                    this.ruleForm.startTime = formatDate(now + 5 * 60 * 1000);
+                                }
+                                if (new Date(this.ruleForm.startTime).getTime() > new Date(this.ruleForm.endTime).getTime()) {
+                                    callback(new Error('上线时间必须小于下线时间'));
+                                } else {
+                                    callback();
+                                }
+                            }, trigger: 'blur'
+                        }
                     ],
                     endTime: [
-                        {required: true, message: '选择下线日期时间', trigger: 'blur'}
+                        {required: true, message: '选择下线日期时间', trigger: 'blur'},
+                        {
+                            validator: (rule, value, callback) => {
+                                let now = new Date().getTime();
+                                if (now > new Date(this.ruleForm.endTime).getTime()) {
+                                    this.ruleForm.endTime = formatDate(now + 5 * 60 * 1000);
+                                }
+                                if (new Date(this.ruleForm.startTime).getTime() > new Date(this.ruleForm.endTime).getTime()) {
+                                    callback(new Error('下线时间必须大于上线时间'));
+                                } else {
+                                    callback();
+                                }
+                            }, trigger: 'blur'
+                        }
                     ],
                 }
             }
@@ -134,6 +166,13 @@
         mounted() {
         },
         methods: {
+            saveHandler(value) {
+                if (this.ruleForm.startTime == "") {
+                    var mydate = new Date().getTime() + 5 * 60 * 1000
+                    console.log(formatDate(new Date().getTime() + 5 * 60 * 1000))
+                    this.ruleForm.startTime = formatDate(mydate)
+                }
+            },
             getAppIconData(obj) {
                 console.log("getAppIconData===")
                 console.log(obj)
@@ -175,9 +214,14 @@
         watch: {
             index() {
                 if (this.type == 'add') {
-                    this.ruleForm.name = '';
-                    this.ruleForm.value = '';
-                    this.ruleForm.sort = '';
+                    this.ruleForm = {
+                        name: '',
+                        pic: [],
+                        links: '',
+                        startTime: formatDate(new Date().getTime() + 5 * 60 * 1000) || "",
+                        endTime: ""
+                    }
+                    this.appIconFileList = []
                 } else if (this.type == 'edit') {
                     this.appIconFileList = [{
                         name: 'food.jpeg',

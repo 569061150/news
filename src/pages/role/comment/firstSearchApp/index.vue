@@ -1,6 +1,6 @@
 <template>
   <!--  page = '  应用推广',-->
-  <div class="pageBar page-type-management">
+  <div>
     <Detail ref="detail" v-show="tab === 'detail'" @change-route="changeRoute"></Detail>
     <Info ref="info" v-if="tab === 'info'" :tableData="tableData" @change-route="changeRoute"
           @updata-server="updataServer"></Info>

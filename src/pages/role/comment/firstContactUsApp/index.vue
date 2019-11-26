@@ -1,6 +1,6 @@
 <template>
   <!--  page = '  应用推广',-->
-  <div class="pageBar page-type-management" style="width: 500px;">
+  <div style="width: 500px;">
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="120px" class="demo-ruleForm">
 
       <el-form-item class="appIcon" label="微信二维码" prop="pic">
